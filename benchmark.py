@@ -62,11 +62,10 @@ def parse_args():
     parser.add_argument("--config_loc", type=Path, help=msg)
 
     msg = """
-    Maximum number of jobs in instance. Special upper bound for instances with
-    permutation constraints, because larger instances cannot be solved in
-    reasonable amount of time.
+    Maximum number of jobs for instances with permutation constraints. This
+    is because larger instances cannot be solved in reasonable amount of time.
     """
-    parser.add_argument("--special_permutation_max_jobs", type=int, help=msg)
+    parser.add_argument("--permutation_max_jobs", type=int, help=msg)
 
     return parser.parse_args()
 
@@ -117,7 +116,7 @@ def _solve(
     num_workers_per_instance: int,
     config_loc: Optional[Path],
     sol_dir: Optional[Path],
-    special_permutation_max_jobs: int,
+    permutation_max_jobs: int,
 ) -> Optional[tuple[str, str, float, float]]:
     """
     Solves a single problem instance.
@@ -128,9 +127,11 @@ def _solve(
     else:
         params = {}
 
-    # TODO use special_permutation_max_jobs to skip large instances
-
     data = read(instance_loc, problem_variant)
+    if data.permutation and data.num_jobs > permutation_max_jobs:
+        # For permutation problems we skip instances that are too large.
+        return
+
     result = solve(
         data=data,
         solver=solver,

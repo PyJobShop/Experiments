@@ -1,5 +1,8 @@
 """
 One-off script for submitting a bunch of jobs to a SLURM cluster.
+
+Specifically, one job is submitted for each (problem, solver, time_limit)
+combination by executing the ``benchmark.py`` script.
 """
 
 from read import Problem
@@ -29,7 +32,7 @@ data/instances/{problem}/*.txt \
 --num_workers_per_instance {num_workers_per_instance} \
 --num_parallel_instances {num_parallel_instances} \
 --solver {solver} \
---special_permutation_max_jobs 100  >>> {out_dir}/results.txt
+--permutation_max_jobs {permutation_max_jobs}  >>> {out_dir}/results.txt
 """
 
 NUM_CORES = 128
@@ -39,6 +42,7 @@ DATA_DIR = Path("data/instances")
 
 SOLVERS = ["ortools", "cpoptimizer"]
 TIME_LIMITS = [120, 900]  # 2 min, 15 min
+PERMUTATION_MAX_JOBS = 200
 
 
 def seconds2string(seconds: int) -> str:
@@ -52,13 +56,8 @@ def main(mock: bool):
         instance_dir = DATA_DIR / problem_variant
         num_instances = len(list(instance_dir.glob("*.txt")))
         job_name = f"{problem_variant}-{solver}-{time_limit}"
-        job_time_limit = seconds2string(
-            int(
-                (num_instances / NUM_PARALLEL_INSTANCES)  # num cycles
-                * time_limit  # time per cycle
-                + 3600  # buffer time
-            )
-        )
+        _total_time = (num_instances / NUM_PARALLEL_INSTANCES) * time_limit
+        job_time_limit = seconds2string(int(_total_time + 3600))  # 3600s buffer
         out_dir = f"data/results/{problem_variant}/{solver}/{time_limit}"
         maybe_mkdir(out_dir)
 
@@ -71,6 +70,7 @@ def main(mock: bool):
             time_limit=time_limit,
             num_workers_per_instance=NUM_WORKERS_PER_INSTANCE,
             num_parallel_instances=NUM_PARALLEL_INSTANCES,
+            permutation_max_jobs=PERMUTATION_MAX_JOBS,
             out_dir=out_dir,
         )
 
