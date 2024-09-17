@@ -1,2 +1,2 @@
-from .Problem import Problem
+from .Problem import ProblemVariant
 from .read import read

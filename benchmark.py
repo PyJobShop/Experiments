@@ -11,7 +11,7 @@ from tqdm.contrib.concurrent import process_map
 
 from pyjobshop import Result, solve
 from pathlib import Path
-from read import Problem, read
+from read import ProblemVariant, read
 
 
 def parse_args():
@@ -23,8 +23,8 @@ def parse_args():
     msg = "Scheduling problem variant to read."
     parser.add_argument(
         "--problem_variant",
-        type=Problem,
-        choices=[f.value for f in Problem],
+        type=ProblemVariant,
+        choices=[f.value for f in ProblemVariant],
         help=msg,
     )
 
@@ -109,7 +109,7 @@ def write_solution(instance_loc: Path, sol_dir: Path, result: Result):
 
 def _solve(
     instance_loc: Path,
-    problem_variant: Problem,
+    problem_variant: ProblemVariant,
     solver: str,
     time_limit: float,
     display: bool,

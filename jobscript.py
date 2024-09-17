@@ -5,7 +5,7 @@ Specifically, one job is submitted for each (problem, solver, time_limit)
 combination by executing the ``benchmark.py`` script.
 """
 
-from read import Problem
+from read import ProblemVariant
 from pathlib import Path
 import argparse
 from itertools import product
@@ -52,7 +52,9 @@ def seconds2string(seconds: int) -> str:
 
 
 def main(mock: bool):
-    for solver, time_limit, problem_variant in product(SOLVERS, TIME_LIMITS, Problem):
+    for solver, time_limit, problem_variant in product(
+        SOLVERS, TIME_LIMITS, ProblemVariant
+    ):
         instance_dir = DATA_DIR / problem_variant
         num_instances = len(list(instance_dir.glob("*.txt")))
         job_name = f"{problem_variant}-{solver}-{time_limit}"
