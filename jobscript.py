@@ -32,7 +32,7 @@ data/instances/{problem}/*.txt \
 --num_workers_per_instance {num_workers_per_instance} \
 --num_parallel_instances {num_parallel_instances} \
 --solver {solver} \
---permutation_max_jobs {permutation_max_jobs}  >>> {out_dir}/results.txt
+--permutation_max_jobs {permutation_max_jobs}  >> {out_dir}/results.txt
 """
 
 NUM_CORES = 128
