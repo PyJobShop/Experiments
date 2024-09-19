@@ -3,7 +3,6 @@ from enum import Enum
 
 class ProblemVariant(str, Enum):
     # Non-permutation machine scheduling problems
-    PMP = "PMP"
     JSP = "JSP"
     FJSP = "FJSP"
     NPFSP = "NPFSP"
