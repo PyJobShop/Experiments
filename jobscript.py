@@ -52,9 +52,10 @@ def seconds2string(seconds: int) -> str:
 
 
 def main(mock: bool):
-    for solver, time_limit, problem_variant in product(
+    for solver, time_limit, problem_variant_enum in product(
         SOLVERS, TIME_LIMITS, ProblemVariant
     ):
+        problem_variant = problem_variant_enum.value
         instance_dir = DATA_DIR / problem_variant
         num_instances = len(list(instance_dir.glob("*.txt")))
         job_name = f"{problem_variant}-{solver}-{time_limit}"
