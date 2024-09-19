@@ -21,7 +21,6 @@ JOBSCRIPT = """#!/bin/sh
 #SBATCH --mail-type=FAIL,END
 #SBATCH --mail-user=l.lan@vu.nl
 #SBATCH --out=slurm/{job_name}-%A_%a.out
-#SBATCH --mem-per-cpu=2G
 
 uv run benchmark.py \
 data/instances/{problem}/*.txt \
