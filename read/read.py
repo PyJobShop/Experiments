@@ -13,7 +13,6 @@ def read(loc: Path, problem: ProblemVariant) -> ProblemData:
     parse_methods = {
         ProblemVariant.JSP: MachineInstance.parse_jsp,
         ProblemVariant.FJSP: MachineInstance.parse_fjsp,
-        ProblemVariant.PMP: MachineInstance.parse_pmp,
         ProblemVariant.HFSP: MachineInstance.parse_hfsp,
         ProblemVariant.NPFSP: MachineInstance.parse_npfsp,
         ProblemVariant.NW_PFSP: MachineInstance.parse_nw_pfsp,

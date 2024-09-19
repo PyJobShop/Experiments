@@ -14,11 +14,11 @@ Experiments related to machine scheduling can be found in the `machine/` folder 
 # PROBLEM=Nowaitflowshop # TODO 800 very large causes problem
 # PROBLEM=Parallelmachine # done, extremely high gaps
 # PROBLEM=Setupflowshop # done, only n<=200
-# PROBLEM=TCTflowshop # done, only n<=200
+PROBLEM=TCT-PFSP # done, only n<=200
 # PROBLEM=Tardinessflowshop # done, only n<=200
 # PROBLEM=RCPSP
 # PROBLEM=MMRCPSP
-PROBLEM=RCMPSP
+# PROBLEM=RCMPSP
 SOLVER="ortools"
 TIME_LIMIT=50
 uv run benchmark.py \
