@@ -11,11 +11,13 @@ def read(loc: Path, problem: ProblemVariant) -> ProblemData:
     Reads a problem instance from file and returns a ProblemData instance.
     """
     parse_methods = {
-        ProblemVariant.FJSP: MachineInstance.parse_fjsp,
-        ProblemVariant.HFSP: MachineInstance.parse_hfsp,
         ProblemVariant.JSP: MachineInstance.parse_jsp,
+        ProblemVariant.FJSP: MachineInstance.parse_fjsp,
+        ProblemVariant.PMP: MachineInstance.parse_pmp,
+        ProblemVariant.HFSP: MachineInstance.parse_hfsp,
         ProblemVariant.NPFSP: MachineInstance.parse_npfsp,
         ProblemVariant.NW_PFSP: MachineInstance.parse_nw_pfsp,
+        # Permutation machine scheduling
         ProblemVariant.PFSP: MachineInstance.parse_pfsp,
         ProblemVariant.SDST_PFSP: MachineInstance.parse_sdst_pfsp,
         ProblemVariant.TCT_PFSP: MachineInstance.parse_tct_pfsp,
