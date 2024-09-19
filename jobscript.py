@@ -8,14 +8,13 @@ combination by executing the ``benchmark.py`` script.
 from read import ProblemVariant
 from pathlib import Path
 import argparse
-from itertools import product
 from subprocess import run
 
 JOBSCRIPT = """#!/bin/sh
 #SBATCH --job-name={job_name}
 #SBATCH --time={job_time_limit}
 #SBATCH --nodes=1
-#SBATCH --partition=rome
+#SBATCH --partition=genoa
 #SBATCH --array=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task={job_cpus_per_task}
@@ -35,14 +34,11 @@ data/instances/{problem}/*.txt \
 --permutation_max_jobs {permutation_max_jobs}  >> {out_dir}/results.txt
 """
 
-NUM_CORES = 128
+NUM_CORES = 192
 NUM_WORKERS_PER_INSTANCE = 8
-NUM_PARALLEL_INSTANCES = 16
+NUM_PARALLEL_INSTANCES = 24
 DATA_DIR = Path("data/instances")
-
-SOLVERS = ["ortools", "cpoptimizer"]
-TIME_LIMITS = [120, 900]  # 2 min, 15 min
-PERMUTATION_MAX_JOBS = 200
+PERMUTATION_MAX_JOBS = 100
 
 
 def seconds2string(seconds: int) -> str:
@@ -51,10 +47,8 @@ def seconds2string(seconds: int) -> str:
     return f"{hours:02d}:{mins:02d}:{seconds:02d}"
 
 
-def main(mock: bool):
-    for solver, time_limit, problem_variant_enum in product(
-        SOLVERS, TIME_LIMITS, ProblemVariant
-    ):
+def main(solver: str, time_limit: int, mock: bool):
+    for problem_variant_enum in ProblemVariant:
         problem_variant = problem_variant_enum.value
         instance_dir = DATA_DIR / problem_variant
         num_instances = len(list(instance_dir.glob("*.txt")))
@@ -84,7 +78,12 @@ def main(mock: bool):
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(prog="batch")
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument(
+        "--solver", type=str, choices=["ortools", "cpoptimizer"], required=True
+    )
+    parser.add_argument("--time_limit", type=int, required=True)
     parser.add_argument("--mock", action="store_true")
 
     return parser.parse_args()
@@ -97,4 +96,4 @@ def maybe_mkdir(where: str):
 
 
 if __name__ == "__main__":
-    main(parse_args().mock)
+    main(**vars(parse_args()))
