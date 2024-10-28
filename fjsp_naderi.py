@@ -1,3 +1,16 @@
+"""
+One-off script to solve FJSP instances using Naderi's OR-Tools model
+and benchmark the results.
+
+Usage:
+
+```
+uv run fjsp_naderi.py \
+--time_limit 900 \
+--num_parallel_instances 8 \
+--num_workers 8 >>> results.txt
+```
+"""
 from dataclasses import dataclass
 from pathlib import Path
 from functools import partial
@@ -158,7 +171,7 @@ def solve(instance_loc: Path, time_limit: int, display: bool, num_workers: int):
 
     status_code = cp_solver.solve(model)
     status = cp_solver.status_name(status_code)
-    status = "Y" if status in ["OPTIMAL", "FEASIBLE"] else "N"
+    status = status.capitalize()
     objective_value = cp_solver.objective_value
 
     return instance_loc.name, status, objective_value, round(cp_solver.wall_time, 3)
