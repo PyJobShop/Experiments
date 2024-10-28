@@ -8,7 +8,8 @@ Usage:
 uv run fjsp_naderi.py \
 --time_limit 900 \
 --num_parallel_instances 8 \
---num_workers 8 >>> results.txt
+--num_workers 8 \
+>> results.txt
 ```
 """
 from dataclasses import dataclass
@@ -19,7 +20,6 @@ from itertools import product
 from argparse import ArgumentParser
 
 from ortools.sat.python.cp_model import CpModel, CpSolver
-from read.machine import MachineInstance
 from tqdm.contrib.concurrent import process_map
 import numpy as np
 
@@ -107,7 +107,7 @@ def fjsp_naderi(instance: Instance):
                     # Only add precedence between (pred, succ) if they actual modes.
                     pred = mode_vars[job, task, m1]
                     succ = mode_vars[job, task + 1, m2]
-                    model.add(pred.end >= succ.start)
+                    model.add(pred.end <= succ.start)
 
     # Minimizing makespan objective
     makespan = model.new_int_var(0, horizon, "makespan")
@@ -131,17 +131,15 @@ def _read(instance_loc):
     """
     Reads the instance file and returns an instance object.
     """
-    data = MachineInstance.parse_fjsp(instance_loc)
+    with open(instance_loc, "r") as fh:
+        lines = iter([list(map(int, line.strip().split())) for line in fh])
 
-    num_jobs = data.num_jobs
-    num_machines = data.num_machines
-    num_tasks_by_job = [len(tasks) for tasks in data.jobs]
-    durations = np.zeros((num_jobs, max(num_tasks_by_job), num_machines), dtype=int)
-
-    for job_idx, tasks in enumerate(data.jobs):
-        for task_idx, task in enumerate(tasks):
-            for mach_idx, duration in task:
-                durations[job_idx, task_idx, mach_idx] = duration
+    num_jobs = next(lines)[0]
+    num_machines = next(lines)[0]
+    num_tasks_by_job = next(lines)
+    durations = [
+        [next(lines) for _ in range(num_tasks)] for num_tasks in num_tasks_by_job
+    ]
 
     return Instance(
         num_jobs=num_jobs,
