@@ -119,7 +119,11 @@ class ProjectInstance:
         model = Model()
 
         resources = [
-            model.add_resource(capacity=res.capacity, renewable=res.renewable)
+            (
+                model.add_renewable(capacity=res.capacity)
+                if res.renewable
+                else model.add_non_renewable(capacity=res.capacity)
+            )
             for res in self.resources
         ]
 

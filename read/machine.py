@@ -57,13 +57,14 @@ class MachineInstance:
                 job2tasks[job_idx].append(task)
 
                 for mach_idx, duration in task_data:
-                    model.add_processing_time(task, machines[mach_idx], duration)
+                    model.add_mode(task, [machines[mach_idx]], duration)
 
             tasks = job2tasks[job_idx]
             for pred, succ in zip(tasks[:-1], tasks[1:]):
                 # Assume linear routing of tasks as presented in the job data.
                 if self.no_wait:
-                    model.add_end_at_start(pred, succ)
+                    model.add_end_before_start(pred, succ)  # e(pred) <= s(succ)
+                    model.add_start_before_end(succ, pred)  # s(succ) <= e(pred)
                 else:
                     model.add_end_before_start(pred, succ)
 

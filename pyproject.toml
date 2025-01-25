@@ -15,4 +15,5 @@ dependencies = [
 package = false
 
 [tool.uv.sources]
-pyjobshop = { git = "https://github.com/PyJobShop/PyJobShop", branch = "same-sequence" }
+# TODO change to http when public
+pyjobshop = { git = "ssh://git@github.com/PyJobShop/Experiments.git", branch = "permutation" }
