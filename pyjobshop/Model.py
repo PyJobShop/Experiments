@@ -38,6 +38,7 @@ class Model:
         self._modes: list[Mode] = []
         self._constraints = Constraints()
         self._objective: Objective = Objective(weight_makespan=1)
+        self._permutation: bool = False
 
         self._id2job: dict[int, int] = {}
         self._id2resource: dict[int, int] = {}
@@ -190,6 +191,7 @@ class Model:
             modes=self.modes,
             constraints=self.constraints,
             objective=self.objective,
+            permutation=self._permutation,
         )
 
     def add_job(
@@ -427,6 +429,12 @@ class Model:
             weight_max_lateness=weight_max_lateness,
         )
         return self._objective
+
+    def set_permutation(self, value: bool = True):
+        """
+        Sets the permutation property of the model.
+        """
+        self._permutation = value
 
     def solve(
         self,

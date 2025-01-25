@@ -183,6 +183,25 @@ class Constraints:
 
                     model.add(cpo.previous(seq_var, var1, var2))
 
+    def _same_sequence_constraints(self):
+        """
+        Adds same sequence constraints.
+        """
+        model, data = self._model, self._data
+
+        if not data.permutation:
+            return  # not a permutation problem
+
+        for idx in range(data.num_resources - 1):
+            seq_var1 = self._sequence_vars[idx]
+            seq_var2 = self._sequence_vars[idx + 1]
+
+            if seq_var1 is None or seq_var2 is None:
+                msg = "Requested resources do not have sequence variables."
+                raise ValueError(msg)
+
+            model.add(cpo.same_sequence(seq_var1, seq_var2))
+
     def add_constraints(self):
         """
         Adds all the constraints to the CP model.
@@ -195,3 +214,4 @@ class Constraints:
         self._timing_constraints()
         self._identical_and_different_resource_constraints()
         self._consecutive_constraints()
+        self._same_sequence_constraints()

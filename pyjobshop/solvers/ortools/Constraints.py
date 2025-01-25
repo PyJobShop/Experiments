@@ -1,5 +1,6 @@
 import numpy as np
 from ortools.sat.python.cp_model import CpModel, LinearExpr
+from itertools import product
 
 import pyjobshop.solvers.utils as utils
 from pyjobshop.ProblemData import (
@@ -203,48 +204,54 @@ class Constraints:
         """
         Creates the circuit constraints for each machine, if activated by
         sequencing constraints (consecutive and setup times).
+
+        IMPORTANT: This is specifically implemented for the experiments in the
+        paper and it is not meant to be used outside the scope of those
+        experiments because it may not be compatible with all other features.
         """
         model, data = self._model, self._data
         setup_times = utils.setup_times_matrix(data)
 
-        for idx, resource in enumerate(data.resources):
+        if not data.permutation:
+            return  # not a permutation problem, skip
+
+        # Create arcs for circuit constraints.
+        arcs = []
+        for idx1 in range(data.num_jobs):
+            arcs.append((0, idx1 + 1, model.new_bool_var("start")))
+            arcs.append((idx1 + 1, 0, model.new_bool_var("end")))
+
+        lits = {}
+        for idx1, idx2 in product(range(data.num_jobs), repeat=2):
+            if idx1 != idx2:
+                lit = model.new_bool_var(f"{idx1} -> {idx2}")
+                lits[idx1, idx2] = lit
+                arcs.append((idx1 + 1, idx2 + 1, lit))
+
+        model.add_circuit(arcs)
+
+        for res_idx, resource in enumerate(data.resources):
             if not isinstance(resource, Machine):
-                continue
+                raise ValueError("Machines only in permutation problems.")
 
-            seq_var = self._sequence_vars[idx]
-            if not seq_var.is_active:
-                # No sequencing constraints active. Skip the creation of
-                # expensive circuit constraints.
-                continue
+            seq_var = self._sequence_vars[res_idx]
+            assert seq_var is not None
 
-            mode_vars = seq_var.mode_vars
-            arcs = seq_var.arcs
+            for idx1, idx2 in product(range(data.num_jobs), repeat=2):
+                if idx1 == idx2:
+                    continue
 
-            graph = [(u, v, var) for (u, v), var in arcs.items()]
-            model.add_circuit(graph)
+                var1 = seq_var.mode_vars[idx1]
+                var2 = seq_var.mode_vars[idx2]
 
-            for idx1, var1 in enumerate(mode_vars):
-                # If the (dummy) self arc is selected, then the var must not
-                # be present.
-                model.add(arcs[idx1, idx1] <= ~var1.present)
-                model.add(arcs[seq_var.DUMMY, seq_var.DUMMY] <= ~var1.present)
-
-            for idx1, var1 in enumerate(mode_vars):
-                for idx2, var2 in enumerate(mode_vars):
-                    if idx1 == idx2:
-                        continue
-
-                    # If the arc is selected, then both tasks must be present.
-                    model.add(arcs[idx1, idx2] <= var1.present)
-                    model.add(arcs[idx1, idx2] <= var2.present)
-
-                    setup = (
-                        setup_times[idx, var1.task_idx, var2.task_idx]
-                        if setup_times is not None
-                        else 0
-                    )
-                    expr = var1.end + setup <= var2.start
-                    model.add(expr).only_enforce_if(arcs[idx1, idx2])
+                lit = lits[idx1, idx2]
+                setup = (
+                    setup_times[res_idx, var1.task_idx, var2.task_idx]
+                    if setup_times is not None
+                    else 0
+                )
+                expr = var1.end + setup <= var2.start
+                model.add(expr).only_enforce_if(lit)
 
     def add_constraints(self):
         """

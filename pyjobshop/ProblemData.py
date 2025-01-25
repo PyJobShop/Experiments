@@ -670,6 +670,9 @@ class ProblemData:
         constraints.
     objective
         The objective function. Default is minimizing the makespan.
+    permutation
+        Whether the problem is a permutation problem. Default is
+        ``False``.
     """
 
     def __init__(
@@ -680,6 +683,7 @@ class ProblemData:
         modes: list[Mode],
         constraints: Optional[Constraints] = None,
         objective: Optional[Objective] = None,
+        permutation: bool = False,
     ):
         self._jobs = jobs
         self._resources = resources
@@ -693,6 +697,7 @@ class ProblemData:
             if objective is not None
             else Objective(weight_makespan=1)
         )
+        self._permutation = permutation
 
         self._validate_parameters()
 
@@ -858,6 +863,13 @@ class ProblemData:
         Returns the objective function of this problem instance.
         """
         return self._objective
+
+    @property
+    def permutation(self) -> bool:
+        """
+        Returns whether the problem is a permutation problem.
+        """
+        return self._permutation
 
     @property
     def num_jobs(self) -> int:
