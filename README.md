@@ -19,8 +19,26 @@ Data in `data/`.
 ## Reproduce all benchmark results
 - `benchmark.py` script interfaces with data
 
+- `notebooks/parse_bks.py`
+- `notebooks/parse_results.py`
+- `parse_stats.py`
 ## Slurm
 - `jobscript.py`
+
+``` sh
+uv run jobscript.py --solver ortools --time_limit 120 
+uv run jobscript.py --solver cpoptimizer --time_limit 120
+uv run jobscript.py --solver ortools --time_limit 900
+uv run jobscript.py --solver cpoptimizer --time_limit 900
+```
+
+
+``` sh
+uv run jobscript_extra.py --solver ortools --time_limit 900
+uv run jobscript_extra.py --solver cpoptimizer --time_limit 900
+```
+
+`
 
 
 ## Notebooks and analysis
