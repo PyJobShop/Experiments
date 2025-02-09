@@ -96,6 +96,7 @@ def write_solution(instance_loc: Path, sol_dir: Path, result: Result):
         fh.write(f"instance: {instance_loc.name}\n")
         fh.write(f"status: {result.status.value}\n")
         fh.write(f"objective: {result.objective}\n")
+        fh.write(f"lower_bound: {result.lower_bound}\n")
         fh.write(f"runtime: {result.runtime}\n")
         fh.write("\n")
 
@@ -117,7 +118,7 @@ def _solve(
     config_loc: Optional[Path],
     sol_dir: Optional[Path],
     permutation_max_jobs: int,
-) -> Optional[tuple[str, str, float, float]]:
+) -> Optional[tuple[str, str, float, float, float]]:
     """
     Solves a single problem instance.
     """
@@ -148,6 +149,7 @@ def _solve(
         instance_loc.name,
         result.status.value,
         result.objective,
+        result.lower_bound,
         round(result.runtime, 2),
     )
 
@@ -195,23 +197,26 @@ def benchmark(instances: list[Path], num_parallel_instances: int, **kwargs):
             unit="instance",
         )
 
-    # Filter out the None results (instances that were skipped).
+    # Filter out the None results (permutation instances that were skipped).
     results = [res for res in results if res is not None]
 
     dtypes = [
         ("inst", "U37"),
-        ("feas", "U37"),
+        ("status", "U37"),
         ("obj", float),
+        ("lb", float),
         ("time", float),
     ]
     data = np.asarray(results, dtype=dtypes)
-    headers = ["Instance", "Status", "Obj.", "Time (s)"]
+    headers = ["Instance", "Status", "Obj.", "LB", "Time (s)"]
 
     avg_objective = data["obj"].mean()
     avg_runtime = data["time"].mean()
-    num_optimal = np.count_nonzero(data["feas"] == "Optimal")
-    num_feas = np.count_nonzero(data["feas"] == "Feasible") + num_optimal
-    num_infeas = np.count_nonzero(data["feas"].size - num_feas)
+
+    num_instances = data["status"].size
+    num_optimal = np.count_nonzero(data["status"] == "Optimal")
+    num_feas = np.count_nonzero(data["status"] == "Feasible") + num_optimal
+    num_infeas = num_instances - num_feas
 
     print("\n", tabulate(headers, data), "\n", sep="")
     print(f"     Avg. objective: {avg_objective:.2f}")
