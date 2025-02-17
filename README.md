@@ -24,8 +24,6 @@ The repository is organized as follows.
 The `data`/ directory 
 - **`bks/`**: Contains all best-known solutions.
 - **`instances/`**: Contains all problem instances.
-- **`results/`**: Contains all raw benchmark results (including full solutions).
-  *Note: This folder is not included in the repository but can be downloaded separately from Zenodo.*
 - **`bks.csv`**: Parsed best-known solutions for result analysis.
 - **`stats.csv`**: Parsed instance data for result analysis.
 - **`results.csv`**: Comprehensive CSV overview of all results.
@@ -39,9 +37,13 @@ Additional utilities
 - **`read/read.py`**: Helper functions to read various instance formats.
 - **`benchmark.py`**: Script for running benchmarks.
 
+Results
+- **`results/`**: Contains all raw benchmark results (including full solutions).
+  *Note: This folder is not included in the repository but can be downloaded separately from Zenodo.*
+
 ## Reproducing results
 
-To reproduce all benchmark results (i.e., the `data/results/` folder), use the `benchmark.py` script which interfaces with the data. For example, to solve all FJSP instances using OR-Tools with a 10-second time limit and 8 cores per instance, run:
+To reproduce all benchmark results (i.e., the `results/` folder), use the `benchmark.py` script which interfaces with the data. For example, to solve all FJSP instances using OR-Tools with a 10-second time limit and 8 cores per instance, run:
 
 ```sh
 uv run benchmark.py data/instances/FJSP/*.txt \
