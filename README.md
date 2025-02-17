@@ -6,7 +6,7 @@ This repository contains experimental code and data for the paper submission rel
 
 Before using this repository, ensure you have the following installed:
 - [uv](https://docs.astral.sh/uv/) (version **0.5.4** or higher)
-- **CP Optimizer** (version **22.1.1.0** or higher)
+- CP Optimizer (version **22.1.1.0** or higher)
 
 Install PyJobShop and all required packages by running:
 
@@ -21,7 +21,7 @@ See [this](https://github.com/PyJobShop/Experiments/tree/permutation) branch for
 
 The repository is organized as follows.
 
-### Data Directory (`data/`)
+The `data`/ directory 
 - **`bks/`**: Contains all best-known solutions.
 - **`instances/`**: Contains all problem instances.
 - **`results/`**: Contains all raw benchmark results (including full solutions).
@@ -30,12 +30,12 @@ The repository is organized as follows.
 - **`stats.csv`**: Parsed instance data for result analysis.
 - **`results.csv`**: Comprehensive CSV overview of all results.
 
-### Notebooks (`notebooks/`)
+The `notebooks/` directory
 - **`parse_bks.ipynb`**: Notebook for parsing best-known solutions.
 - **`parse_results.ipynb`**: Notebook for parsing benchmark results.
 - **`analysis.ipynb`**: Notebook for performing results analysis.
 
-### Additional Utilities
+Additional utilities
 - **`read/read.py`**: Helper functions to read various instance formats.
 - **`benchmark.py`**: Script for running benchmarks.
 
