@@ -38,7 +38,7 @@ Additional utilities:
 
 Results:
 - `results/`: Contains all raw benchmark results (including full solutions).  
-  *Note: This folder is not included in the repository but can be downloaded separately from Zenodo.*
+  *Note: This folder is not included in the repository but can be downloaded separately from [Zenodo](https://zenodo.org/records/14882989).*
 
 ## Reproducing results
 
