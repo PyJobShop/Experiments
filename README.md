@@ -1,12 +1,12 @@
 # Experiments
 
-This repository contains experimental code and data for the paper submission related to **PyJobShop**.
+This repository contains experimental code and data for the paper submission related to PyJobShop.
 
 ## Installation
 
 Before using this repository, ensure you have the following installed:
-- [uv](https://docs.astral.sh/uv/) (version **0.5.4** or higher)
-- CP Optimizer (version **22.1.1.0** or higher)
+- [uv](https://docs.astral.sh/uv/) (version 0.5.4 or higher)
+- CP Optimizer (version 22.1.1.0 or higher)
 
 Install PyJobShop and all required packages by running:
 
@@ -14,31 +14,30 @@ Install PyJobShop and all required packages by running:
 uv sync
 ```
 
-This command installs PyJobShop at commit [3ad1a02](https://github.com/PyJobShop/PyJobShop/commit/3ad1a02920a285c431e80786388facfa87affc52), which has been modified to support permutation constraints.
-See [this](https://github.com/PyJobShop/Experiments/tree/permutation) branch for more details.
+This command installs PyJobShop at commit [3ad1a02](https://github.com/PyJobShop/PyJobShop/commit/3ad1a02920a285c431e80786388facfa87affc52), which has been modified to support permutation constraints. See [this](https://github.com/PyJobShop/Experiments/tree/permutation) branch for more details.
 
 ## Repository structure
 
 The repository is organized as follows.
 
-The `data`/ directory 
-- **`bks/`**: Contains all best-known solutions.
-- **`instances/`**: Contains all problem instances.
-- **`bks.csv`**: Parsed best-known solutions for result analysis.
-- **`stats.csv`**: Parsed instance data for result analysis.
-- **`results.csv`**: Comprehensive CSV overview of all results.
+The `data`/ directory:
+- `bks/`: Contains all best-known solutions.
+- `instances/`: Contains all problem instances.
+- `bks.csv`: Parsed best-known solutions for result analysis.
+- `stats.csv`: Parsed instance data for result analysis.
+- `results.csv`: Comprehensive CSV overview of all results.
 
-The `notebooks/` directory
-- **`parse_bks.ipynb`**: Notebook for parsing best-known solutions.
-- **`parse_results.ipynb`**: Notebook for parsing benchmark results.
-- **`analysis.ipynb`**: Notebook for performing results analysis.
+The `notebooks/` directory:
+- `parse_bks.ipynb`: Notebook for parsing best-known solutions.
+- `parse_results.ipynb`: Notebook for parsing benchmark results.
+- `analysis.ipynb`: Notebook for performing results analysis.
 
-Additional utilities
-- **`read/read.py`**: Helper functions to read various instance formats.
-- **`benchmark.py`**: Script for running benchmarks.
+Additional utilities:
+- `read/read.py`: Helper functions to read various instance formats.
+- `benchmark.py`: Script for running benchmarks.
 
-Results
-- **`results/`**: Contains all raw benchmark results (including full solutions).
+Results:
+- `results/`: Contains all raw benchmark results (including full solutions).  
   *Note: This folder is not included in the repository but can be downloaded separately from Zenodo.*
 
 ## Reproducing results
@@ -80,4 +79,4 @@ After running the experiments, execute the following scripts to generate parsed 
 
 ## Other
 
-- **`fjsp_naderi.py`**: Replicates the FJSP model from Naderi et al. (2023).
+- `fjsp_naderi.py`: Replicates the FJSP model from Naderi et al. (2023).
