@@ -47,14 +47,13 @@ def seconds2string(seconds: int) -> str:
 
 
 def main(solver: str, time_limit: int, mock: bool):
-    for problem_variant_enum in ["JSP", "FJSP", "HFSP", "RCPSP", "MMRCPSP"]:
-        problem_variant = problem_variant_enum.value
+    for problem_variant in ["JSP", "FJSP", "HFSP", "RCPSP", "MMRCPSP"]:
         instance_dir = DATA_DIR / problem_variant
         num_instances = len(list(instance_dir.glob("*.txt")))
         job_name = f"{problem_variant}-{solver}-{time_limit}"
         _total_time = (num_instances / NUM_PARALLEL_INSTANCES) * time_limit
         job_time_limit = seconds2string(int(_total_time + 3600))  # 3600s buffer
-        out_dir = f"data/results/{problem_variant}/{solver}/{time_limit}"
+        out_dir = f"data/results-new/{problem_variant}/{solver}/{time_limit}"
         maybe_mkdir(out_dir)
 
         jobscript = JOBSCRIPT.format(
