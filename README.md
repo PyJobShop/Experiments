@@ -14,7 +14,8 @@ Install PyJobShop and all required packages by running:
 uv sync
 ```
 
-This command installs PyJobShop at commit [3ad1a02](https://github.com/PyJobShop/PyJobShop/commit/3ad1a02920a285c431e80786388facfa87affc52), which has been modified to support permutation constraints. See [this](https://github.com/PyJobShop/Experiments/tree/permutation) branch for more details.
+This command installs PyJobShop at commit [3ad1a02](https://github.com/PyJobShop/PyJobShop/commit/3ad1a02920a285c431e80786388facfa87affc52), which has been modified to support permutation constraints. See [this](https://github.com/PyJobShop/Experiments/commit/f29232f6a2de36b26f577168065ebe5f83dbe820) commit for more details.
+
 
 ## Repository structure
 
