@@ -1,7 +1,7 @@
 [project]
 name = "experiments"
 version = "0.1.0"
-description = "TODO"
+description = "Experiments for the PyJobShop paper submission."
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
@@ -15,5 +15,4 @@ dependencies = [
 package = false
 
 [tool.uv.sources]
-# TODO change to http when public
-pyjobshop = { git = "ssh://git@github.com/PyJobShop/Experiments.git", branch = "permutation" }
+pyjobshop = { path = "./pyjobshop" }
