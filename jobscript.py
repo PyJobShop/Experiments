@@ -47,7 +47,7 @@ def seconds2string(seconds: int) -> str:
 
 
 def main(solver: str, time_limit: int, mock: bool):
-    for problem_variant_enum in ProblemVariant:
+    for problem_variant_enum in ["JSP", "FJSP", "HFSP", "RCPSP", "MMRCPSP"]:
         problem_variant = problem_variant_enum.value
         instance_dir = DATA_DIR / problem_variant
         num_instances = len(list(instance_dir.glob("*.txt")))
