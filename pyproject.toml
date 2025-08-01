@@ -15,4 +15,4 @@ dependencies = [
 package = false
 
 [tool.uv.sources]
-pyjobshop = { path = "./pyjobshop" }
+pyjobshop = { git = "https://github.com/PyJobShop/PyJobShop/", rev = "537ffb1" }
