@@ -13,6 +13,7 @@ class ProblemVariant(str, Enum):
     SDST_PFSP = "SDST-PFSP"
     TCT_PFSP = "TCT-PFSP"
     TT_PFSP = "TT-PFSP"
+    DPFSP = "DPFSP"
     # Project scheduling problems
     RCPSP = "RCPSP"
     MMRCPSP = "MMRCPSP"
