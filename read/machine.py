@@ -87,19 +87,20 @@ class MachineInstance:
                 tasks2 = [tasks[stage_idx2] for tasks in job2tasks]
                 machine1 = machines[idx1]
                 machine2 = machines[idx2]
-                print(stage_idx1, stage_idx2, idx1, idx2)
                 model.add_same_sequence(machine1, machine2, tasks1, tasks2)
 
-            # add modes
-            modes_by_resource = defaultdict(list)
-            for mode in model.modes:
-                modes_by_resource[mode.resources[0]].append(mode)
+            # Mode dependencies only relevant for distributed flow shops.
+            if self.num_machines_per_factory:
+                modes_by_resource = defaultdict(list)
+                for mode in model.modes:
+                    modes_by_resource[mode.resources[0]].append(mode)
 
-            for idx1, idx2 in self.permutation:
-                for mode1 in modes_by_resource[idx1]:
-                    for mode2 in modes_by_resource[idx2]:
-                        if mode1.task + 1 == mode2.task:
-                            model.add_mode_dependency(mode1, [mode2])
+                # This ensures that a job is processed for one specific factory.
+                for idx1, idx2 in self.permutation:
+                    for mode1 in modes_by_resource[idx1]:
+                        for mode2 in modes_by_resource[idx2]:
+                            if mode1.task + 1 == mode2.task:
+                                model.add_mode_dependency(mode1, [mode2])
 
         if self.setup_times:
             for mach_idx in range(self.num_machines):
