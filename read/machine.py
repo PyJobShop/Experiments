@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 from pyjobshop import Model, ProblemData
-from itertools import product
+from itertools import product, pairwise
 
 
 def _read(loc: Path):
@@ -45,12 +45,16 @@ class MachineInstance:
         """
         model = Model()
         machines = [model.add_machine() for _ in range(self.num_machines)]
-        model.set_permutation(self.permutation)
 
         job2tasks = [[] for _ in range(self.num_jobs)]
         for job_idx in range(self.num_jobs):
             due_date = self.due_dates[job_idx] if self.due_dates else None
-            job = model.add_job(due_date=due_date)
+            job = (
+                # Only create explicit jobs if we don't minimize makespan.
+                model.add_job(due_date=due_date)
+                if self.objective != "makespan"
+                else None
+            )
 
             for task_data in self.jobs[job_idx]:
                 task = model.add_task(job=job)
@@ -59,14 +63,25 @@ class MachineInstance:
                 for mach_idx, duration in task_data:
                     model.add_mode(task, [machines[mach_idx]], duration)
 
-            tasks = job2tasks[job_idx]
-            for pred, succ in zip(tasks[:-1], tasks[1:]):
+            for pred, succ in pairwise(job2tasks[job_idx]):
                 # Assume linear routing of tasks as presented in the job data.
                 if self.no_wait:
                     model.add_end_before_start(pred, succ)  # e(pred) <= s(succ)
                     model.add_start_before_end(succ, pred)  # s(succ) <= e(pred)
                 else:
                     model.add_end_before_start(pred, succ)
+
+        if self.permutation:
+            # If we have a permutation problem, we can assume that each pair of
+            # machines needs to be in the same sequence.
+            # TODO not true for distributed permutation flow shop
+            for idx1, idx2 in pairwise(range(len(machines))):
+                # The tasks are the ones on the same machine index.
+                tasks1 = [tasks[idx1] for tasks in job2tasks]
+                tasks2 = [tasks[idx2] for tasks in job2tasks]
+                machine1 = machines[idx1]
+                machine2 = machines[idx2]
+                model.add_same_sequence(machine1, machine2, tasks1, tasks2)
 
         if self.setup_times:
             for mach_idx in range(self.num_machines):

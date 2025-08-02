@@ -129,7 +129,7 @@ def _solve(
         params = {}
 
     data = read(instance_loc, problem_variant)
-    if data.permutation and data.num_jobs > permutation_max_jobs:
+    if data.constraints.same_sequence and data.num_jobs > permutation_max_jobs:
         # For permutation problems we skip instances that are too large.
         return
 
