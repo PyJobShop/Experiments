@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
 from pyjobshop import Model, ProblemData
 from itertools import product, pairwise
 
@@ -24,12 +23,12 @@ class MachineInstance:
 
     num_machines: int
     jobs: list[list[TaskData]]  # also defines precedence constraints
-    permutation: bool = False
+    permutation: list[tuple[int, int]] | None = None  # tuples of machine idcs
     no_wait: bool = False
-    setup_times: Optional[list[list[list[int]]]] = None
+    setup_times: list[list[list[int]]] | None = None
     objective: str = "makespan"
-    due_dates: Optional[list[int]] = None
-    num_machines_per_stage: Optional[list[int]] = None
+    due_dates: list[int] | None = None
+    num_machines_per_stage: list[int] | None = None
 
     @property
     def num_jobs(self) -> int:
@@ -71,12 +70,11 @@ class MachineInstance:
                 else:
                     model.add_end_before_start(pred, succ)
 
-        if self.permutation:
-            # If we have a permutation problem, we can assume that each pair of
-            # machines needs to be in the same sequence.
-            # TODO not true for distributed permutation flow shop
-            for idx1, idx2 in pairwise(range(len(machines))):
+        if self.permutation is not None:
+            for idx1, idx2 in self.permutation:
                 # The tasks are the ones on the same machine index.
+                # TODO not true for distributed permutation flow shop,
+                # because idx should refer to the stage
                 tasks1 = [tasks[idx1] for tasks in job2tasks]
                 tasks2 = [tasks[idx2] for tasks in job2tasks]
                 machine1 = machines[idx1]
@@ -151,6 +149,8 @@ class MachineInstance:
                 tasks = [(mach_idx, duration) for mach_idx in stage2machines[stage]]
                 jobs[job_idx].append(tasks)
 
+        # TODO add super machine in addition?
+
         return MachineInstance(
             sum(num_machines_per_stage),
             jobs,
@@ -193,6 +193,7 @@ class MachineInstance:
     def parse_nw_pfsp(cls, loc: Path):
         instance = cls.parse_npfsp(loc)
         instance.no_wait = True
+        # TODO might add permutation here for CP Optimizer?
         return instance
 
     @classmethod
@@ -210,7 +211,7 @@ class MachineInstance:
     @classmethod
     def parse_pfsp(cls, loc: Path):
         instance = cls.parse_npfsp(loc)
-        instance.permutation = True
+        instance.permutation = list(pairwise(range(instance.num_machines)))
         return instance
 
     @classmethod
@@ -229,13 +230,15 @@ class MachineInstance:
                 jobs[job_idx].append([(mach_idx, duration)])
 
         return MachineInstance(
-            num_machines, jobs, permutation=True, setup_times=setup_times
+            num_machines,
+            jobs,
+            permutation=list(pairwise(range(num_machines))),
+            setup_times=setup_times,
         )
 
     @classmethod
     def parse_tct_pfsp(cls, loc: Path):
-        instance = cls.parse_npfsp(loc)
-        instance.permutation = True
+        instance = cls.parse_pfsp(loc)
         instance.objective = "total_completion_time"
         return instance
 
@@ -255,7 +258,7 @@ class MachineInstance:
         return MachineInstance(
             num_machines,
             jobs,
-            permutation=True,
+            permutation=list(pairwise(range(num_machines))),
             objective="total_tardiness",
             due_dates=due_dates,
         )
