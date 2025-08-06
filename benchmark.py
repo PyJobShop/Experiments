@@ -129,9 +129,15 @@ def _solve(
         params = {}
 
     data = read(instance_loc, problem_variant)
-    if data.permutation and data.num_jobs > permutation_max_jobs:
+    if data.constraints.same_sequence:
         # For permutation problems we skip instances that are too large.
-        return
+        # We have to recompute the number of jobs because we no longer
+        # create jobs if they are not relevant to the problem.
+        num_factories = data.num_modes // data.num_tasks
+        num_stages = data.num_machines // num_factories
+        num_jobs = data.num_tasks // num_stages
+        if num_jobs >= permutation_max_jobs:
+            return
 
     result = solve(
         data=data,

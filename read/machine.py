@@ -1,15 +1,14 @@
 from dataclasses import dataclass
+from collections import defaultdict
 from pathlib import Path
-from typing import Optional
+from typing import Iterator
 from pyjobshop import Model, ProblemData
-from itertools import product
+from itertools import product, pairwise
 
 
-def _read(loc: Path):
+def _read(loc: Path) -> Iterator[list[int]]:
     with open(loc) as fh:
-        data = [list(map(int, line.strip().split())) for line in fh]
-
-    return iter(data)
+        return iter([list(map(int, line.strip().split())) for line in fh])
 
 
 TaskData = list[tuple[int, int]]  # machine idx, duration
@@ -24,12 +23,14 @@ class MachineInstance:
 
     num_machines: int
     jobs: list[list[TaskData]]  # also defines precedence constraints
-    permutation: bool = False
+    permutation: list[tuple[int, int]] | None = None  # tuples of machine idcs
     no_wait: bool = False
-    setup_times: Optional[list[list[list[int]]]] = None
+    setup_times: list[list[list[int]]] | None = None
     objective: str = "makespan"
-    due_dates: Optional[list[int]] = None
-    num_machines_per_stage: Optional[list[int]] = None
+    due_dates: list[int] | None = None
+    num_machines_per_stage: list[int] | None = None
+    num_factories: int | None = None
+    num_machines_per_factory: int | None = None
 
     @property
     def num_jobs(self) -> int:
@@ -45,28 +46,50 @@ class MachineInstance:
         """
         model = Model()
         machines = [model.add_machine() for _ in range(self.num_machines)]
-        model.set_permutation(self.permutation)
 
         job2tasks = [[] for _ in range(self.num_jobs)]
         for job_idx in range(self.num_jobs):
             due_date = self.due_dates[job_idx] if self.due_dates else None
-            job = model.add_job(due_date=due_date)
+            job = (
+                # Only create explicit jobs if we don't minimize makespan.
+                model.add_job(due_date=due_date)
+                if self.objective != "makespan"
+                else None
+            )
 
             for task_data in self.jobs[job_idx]:
                 task = model.add_task(job=job)
                 job2tasks[job_idx].append(task)
 
                 for mach_idx, duration in task_data:
-                    model.add_mode(task, [machines[mach_idx]], duration)
+                    model.add_mode(task, machines[mach_idx], duration)
 
-            tasks = job2tasks[job_idx]
-            for pred, succ in zip(tasks[:-1], tasks[1:]):
+            for pred, succ in pairwise(job2tasks[job_idx]):
                 # Assume linear routing of tasks as presented in the job data.
                 if self.no_wait:
                     model.add_end_before_start(pred, succ)  # e(pred) <= s(succ)
                     model.add_start_before_end(succ, pred)  # s(succ) <= e(pred)
                 else:
                     model.add_end_before_start(pred, succ)
+
+        if self.permutation is not None:
+            for idx1, idx2 in self.permutation:
+                machine2 = machines[idx1]
+                machine2 = machines[idx2]
+                model.add_same_sequence(machine1, machine2)
+
+            # Mode dependencies only relevant for distributed flow shops.
+            if self.num_machines_per_factory:
+                modes_by_resource = defaultdict(list)
+                for mode in model.modes:
+                    modes_by_resource[mode.resources[0]].append(mode)
+
+                # This ensures that a job is processed for one specific factory.
+                for idx1, idx2 in self.permutation:
+                    for mode1 in modes_by_resource[idx1]:
+                        for mode2 in modes_by_resource[idx2]:
+                            if mode1.task + 1 == mode2.task:
+                                model.add_mode_dependency(mode1, [mode2])
 
         if self.setup_times:
             for mach_idx in range(self.num_machines):
@@ -178,6 +201,7 @@ class MachineInstance:
     def parse_nw_pfsp(cls, loc: Path):
         instance = cls.parse_npfsp(loc)
         instance.no_wait = True
+        # TODO might add permutation here for CP Optimizer?
         return instance
 
     @classmethod
@@ -195,7 +219,7 @@ class MachineInstance:
     @classmethod
     def parse_pfsp(cls, loc: Path):
         instance = cls.parse_npfsp(loc)
-        instance.permutation = True
+        instance.permutation = list(pairwise(range(instance.num_machines)))
         return instance
 
     @classmethod
@@ -214,13 +238,15 @@ class MachineInstance:
                 jobs[job_idx].append([(mach_idx, duration)])
 
         return MachineInstance(
-            num_machines, jobs, permutation=True, setup_times=setup_times
+            num_machines,
+            jobs,
+            permutation=list(pairwise(range(num_machines))),
+            setup_times=setup_times,
         )
 
     @classmethod
     def parse_tct_pfsp(cls, loc: Path):
-        instance = cls.parse_npfsp(loc)
-        instance.permutation = True
+        instance = cls.parse_pfsp(loc)
         instance.objective = "total_completion_time"
         return instance
 
@@ -240,7 +266,44 @@ class MachineInstance:
         return MachineInstance(
             num_machines,
             jobs,
-            permutation=True,
+            permutation=list(pairwise(range(num_machines))),
             objective="total_tardiness",
             due_dates=due_dates,
+        )
+
+    @classmethod
+    def parse_dpfsp(cls, loc: Path):
+        lines = _read(loc)
+        num_jobs = next(lines)[0]
+        num_machines_per_factory = next(lines)[0]
+        num_factories = next(lines)[0]
+        processing_times = [next(lines) for _ in range(num_jobs)]
+
+        jobs = [[] for _ in range(num_jobs)]
+        for job_idx in range(num_jobs):
+            for stage_idx in range(num_machines_per_factory):
+                # Every factory consists of `num_machines_per_stage` machines,
+                # this stage index refers to the k-th machine within the factory.
+                modes = []
+                for factory_idx in range(num_factories):
+                    machine_idx = stage_idx + factory_idx * num_machines_per_factory
+                    duration = processing_times[job_idx][stage_idx]
+                    modes.append((machine_idx, duration))
+
+                jobs[job_idx].append(modes)
+
+        permutations = []
+        for factory_idx in range(num_factories):
+            for idx1, idx2 in pairwise(range(num_machines_per_factory)):
+                # This creates tuples for every two consecutive machines
+                # per factory with the _actual_ machine index.
+                base_idx = factory_idx * num_machines_per_factory
+                permutations.append((base_idx + idx1, base_idx + idx2))
+
+        return MachineInstance(
+            num_machines_per_factory * num_factories,
+            jobs,
+            permutation=permutations,
+            num_factories=num_factories,
+            num_machines_per_factory=num_machines_per_factory,
         )

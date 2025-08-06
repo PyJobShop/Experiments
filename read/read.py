@@ -21,6 +21,7 @@ def read(loc: Path, problem: ProblemVariant) -> ProblemData:
         ProblemVariant.SDST_PFSP: MachineInstance.parse_sdst_pfsp,
         ProblemVariant.TCT_PFSP: MachineInstance.parse_tct_pfsp,
         ProblemVariant.TT_PFSP: MachineInstance.parse_tt_pfsp,
+        ProblemVariant.DPFSP: MachineInstance.parse_dpfsp,
         # Project scheduling problems have instance-format specific parsers.
         ProblemVariant.RCPSP: ProjectInstance.parse_patterson,
         ProblemVariant.MMRCPSP: ProjectInstance.parse_psplib,
