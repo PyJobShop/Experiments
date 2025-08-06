@@ -74,20 +74,9 @@ class MachineInstance:
 
         if self.permutation is not None:
             for idx1, idx2 in self.permutation:
-                # The tasks are the ones on the same machine index (or stage_idx
-                # if we have a distributed flow shop).
-                if self.num_machines_per_factory:
-                    stage_idx1 = idx1 % self.num_machines_per_factory
-                    stage_idx2 = idx2 % self.num_machines_per_factory
-                else:
-                    stage_idx1 = idx1
-                    stage_idx2 = idx2
-
-                tasks1 = [tasks[stage_idx1] for tasks in job2tasks]
-                tasks2 = [tasks[stage_idx2] for tasks in job2tasks]
-                machine1 = machines[idx1]
+                machine2 = machines[idx1]
                 machine2 = machines[idx2]
-                model.add_same_sequence(machine1, machine2, tasks1, tasks2)
+                model.add_same_sequence(machine1, machine2)
 
             # Mode dependencies only relevant for distributed flow shops.
             if self.num_machines_per_factory:
