@@ -74,7 +74,7 @@ class MachineInstance:
 
         if self.permutation is not None:
             for idx1, idx2 in self.permutation:
-                machine2 = machines[idx1]
+                machine1 = machines[idx1]
                 machine2 = machines[idx2]
                 model.add_same_sequence(machine1, machine2)
 
