@@ -170,8 +170,6 @@ class MachineInstance:
                 tasks = [(mach_idx, duration) for mach_idx in stage2machines[stage]]
                 jobs[job_idx].append(tasks)
 
-        # TODO add super machine in addition?
-
         return MachineInstance(
             sum(num_machines_per_stage),
             jobs,
