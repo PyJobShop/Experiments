@@ -473,7 +473,7 @@ requires-dist = [
     { name = "jupyterlab", specifier = ">=4.2.5" },
     { name = "numpy", specifier = ">=1.26.4" },
     { name = "openpyxl", specifier = ">=3.1.5" },
-    { name = "pyjobshop", extras = ["docplex"], git = "https://github.com/PyJobShop/PyJobShop/?rev=537ffb1" },
+    { name = "pyjobshop", extras = ["docplex"], git = "https://github.com/PyJobShop/PyJobShop/?rev=2a389a7" },
 ]
 
 [[package]]
@@ -1553,7 +1553,7 @@ wheels = [
 [[package]]
 name = "pyjobshop"
 version = "0.1.0a0"
-source = { git = "https://github.com/PyJobShop/PyJobShop/?rev=537ffb1#537ffb15e8c5de1d58fc103b656b99f960a4d281" }
+source = { git = "https://github.com/PyJobShop/PyJobShop/?rev=2a389a7#2a389a7d68b5722d33b08a52bf08f463a2fa80b8" }
 dependencies = [
     { name = "fjsplib" },
     { name = "matplotlib" },
