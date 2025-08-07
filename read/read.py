@@ -16,6 +16,7 @@ def read(loc: Path, problem: ProblemVariant) -> ProblemData:
         ProblemVariant.HFSP: MachineInstance.parse_hfsp,
         ProblemVariant.NPFSP: MachineInstance.parse_npfsp,
         ProblemVariant.NW_PFSP: MachineInstance.parse_nw_pfsp,
+        ProblemVariant.PMP: MachineInstance.parse_pmp,
         # Permutation machine scheduling
         ProblemVariant.PFSP: MachineInstance.parse_pfsp,
         ProblemVariant.SDST_PFSP: MachineInstance.parse_sdst_pfsp,
