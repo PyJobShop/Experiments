@@ -10,7 +10,7 @@ def read(loc: Path, problem: ProblemVariant) -> ProblemData:
     """
     Reads a problem instance from file and returns a ProblemData instance.
     """
-    parse_methods = {
+    machine_variants = {
         ProblemVariant.JSP: MachineInstance.parse_jsp,
         ProblemVariant.FJSP: MachineInstance.parse_fjsp,
         ProblemVariant.HFSP: MachineInstance.parse_hfsp,
@@ -22,6 +22,8 @@ def read(loc: Path, problem: ProblemVariant) -> ProblemData:
         ProblemVariant.TCT_PFSP: MachineInstance.parse_tct_pfsp,
         ProblemVariant.TT_PFSP: MachineInstance.parse_tt_pfsp,
         ProblemVariant.DPFSP: MachineInstance.parse_dpfsp,
+    }
+    project_variants = {
         # Project scheduling problems have instance-format specific parsers,
         # which are already supported directly by PyJobShop's read function.
         ProblemVariant.RCPSP: partial(_read, instance_format="patterson"),
@@ -30,12 +32,11 @@ def read(loc: Path, problem: ProblemVariant) -> ProblemData:
         ProblemVariant.ASLIB: partial(_read, instance_format="aslib"),
     }
 
-    parse_method = parse_methods.get(problem)
-    if parse_method is None:
-        raise ValueError(f"Unsupported problem type: {problem}")
-
-    instance = parse_method(loc)
-    if isinstance(instance, MachineInstance):
+    if problem in machine_variants:
+        instance = machine_variants[problem](loc)
         return instance.data()
 
-    return instance
+    if problem in project_variants:
+        return project_variants[problem](loc)
+
+    raise ValueError(f"Unsupported problem type: {problem}")
