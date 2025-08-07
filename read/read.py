@@ -27,6 +27,7 @@ def read(loc: Path, problem: ProblemVariant) -> ProblemData:
         ProblemVariant.RCPSP: partial(_read, instance_format="patterson"),
         ProblemVariant.MMRCPSP: partial(_read, instance_format="psplib"),
         ProblemVariant.RCMPSP: partial(_read, instance_format="psplib"),
+        ProblemVariant.ASLIB: partial(_read, instance_format="aslib"),
     }
 
     parse_method = parse_methods.get(problem)
