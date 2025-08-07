@@ -1,9 +1,9 @@
 from pathlib import Path
 from .Problem import ProblemVariant
 from .machine import MachineInstance
-from .project import ProjectInstance
+from functools import partial
 
-from pyjobshop import ProblemData
+from pyjobshop import ProblemData, read as _read
 
 
 def read(loc: Path, problem: ProblemVariant) -> ProblemData:
@@ -22,10 +22,11 @@ def read(loc: Path, problem: ProblemVariant) -> ProblemData:
         ProblemVariant.TCT_PFSP: MachineInstance.parse_tct_pfsp,
         ProblemVariant.TT_PFSP: MachineInstance.parse_tt_pfsp,
         ProblemVariant.DPFSP: MachineInstance.parse_dpfsp,
-        # Project scheduling problems have instance-format specific parsers.
-        ProblemVariant.RCPSP: ProjectInstance.parse_patterson,
-        ProblemVariant.MMRCPSP: ProjectInstance.parse_psplib,
-        ProblemVariant.RCMPSP: ProjectInstance.parse_mplib,
+        # Project scheduling problems have instance-format specific parsers,
+        # which are already supported directly by PyJobShop's read function.
+        ProblemVariant.RCPSP: partial(_read, instance_format="patterson"),
+        ProblemVariant.MMRCPSP: partial(_read, instance_format="psplib"),
+        ProblemVariant.RCMPSP: partial(_read, instance_format="psplib"),
     }
 
     parse_method = parse_methods.get(problem)
@@ -33,4 +34,7 @@ def read(loc: Path, problem: ProblemVariant) -> ProblemData:
         raise ValueError(f"Unsupported problem type: {problem}")
 
     instance = parse_method(loc)
-    return instance.data()
+    if isinstance(instance, MachineInstance):
+        return instance.data()
+
+    return instance
