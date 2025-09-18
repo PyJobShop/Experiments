@@ -23,7 +23,7 @@ JOBSCRIPT = """#!/bin/sh
 #SBATCH --out=slurm/{job_name}-%A_%a.out
 
 uv run benchmark.py \
-data/instances/{problem}/*.txt \
+{data_dir}/{problem}/*.txt \
 --problem_variant {problem} \
 --sol_dir {out_dir} \
 --time_limit {time_limit} \
@@ -33,12 +33,6 @@ data/instances/{problem}/*.txt \
 --permutation_max_jobs {permutation_max_jobs}  >> {out_dir}/results.txt
 """
 
-NUM_CORES = 192
-NUM_WORKERS_PER_INSTANCE = 8
-NUM_PARALLEL_INSTANCES = 24
-DATA_DIR = Path("data/instances")
-PERMUTATION_MAX_JOBS = 100
-
 
 def seconds2string(seconds: int) -> str:
     mins, seconds = divmod(seconds, 60)
@@ -46,28 +40,41 @@ def seconds2string(seconds: int) -> str:
     return f"{hours:02d}:{mins:02d}:{seconds:02d}"
 
 
-def main(solver: str, time_limit: int, mock: bool):
-    for problem_variant_enum in ProblemVariant:
-        problem_variant = problem_variant_enum.value
-        instance_dir = DATA_DIR / problem_variant
+def main(
+    solver: str,
+    time_limit: int,
+    problem_variants: list[str],
+    mock: bool,
+    num_cores: int,
+    num_workers_per_instance: int,
+    num_parallel_instances: int,
+    results_dir: Path,
+    data_dir: Path,
+    permutation_max_jobs: int,
+):
+    for problem_variant in problem_variants:
+        instance_dir = data_dir / problem_variant
         num_instances = len(list(instance_dir.glob("*.txt")))
         job_name = f"{problem_variant}-{solver}-{time_limit}"
-        _total_time = (num_instances / NUM_PARALLEL_INSTANCES) * time_limit
-        job_time_limit = seconds2string(int(_total_time + 3600))  # 3600s buffer
-        out_dir = f"data/results/{problem_variant}/{solver}/{time_limit}"
+        _total_time = (num_instances / num_parallel_instances) * time_limit
+        job_time_limit = seconds2string(
+            int(_total_time + 3600)
+        )  # 3600s buffer
+        out_dir = results_dir / f"{problem_variant}/{solver}/{time_limit}"
         maybe_mkdir(out_dir)
 
         jobscript = JOBSCRIPT.format(
             job_name=job_name,
-            job_cpus_per_task=NUM_CORES,
+            job_cpus_per_task=num_cores,
             job_time_limit=job_time_limit,
             problem=problem_variant,
             solver=solver,
             time_limit=time_limit,
-            num_workers_per_instance=NUM_WORKERS_PER_INSTANCE,
-            num_parallel_instances=NUM_PARALLEL_INSTANCES,
-            permutation_max_jobs=PERMUTATION_MAX_JOBS,
+            num_workers_per_instance=num_workers_per_instance,
+            num_parallel_instances=num_parallel_instances,
+            permutation_max_jobs=permutation_max_jobs,
             out_dir=out_dir,
+            data_dir=data_dir,
         )
 
         if mock:
@@ -83,12 +90,30 @@ def parse_args():
         "--solver", type=str, choices=["ortools", "cpoptimizer"], required=True
     )
     parser.add_argument("--time_limit", type=int, required=True)
+    parser.add_argument(
+        "--problem_variants",
+        type=str,
+        nargs="+",
+        choices=[variant.value for variant in ProblemVariant],
+        default=[variant.value for variant in ProblemVariant],
+    )
     parser.add_argument("--mock", action="store_true")
+
+    parser.add_argument("--num_cores", type=int, default=192)
+    parser.add_argument("--num_workers_per_instance", type=int, default=8)
+    parser.add_argument("--num_parallel_instances", type=int, default=24)
+    parser.add_argument(
+        "--results_dir", type=Path, default=Path("data/results")
+    )
+    parser.add_argument(
+        "--data_dir", type=Path, default=Path("data/instances")
+    )
+    parser.add_argument("--permutation_max_jobs", type=int, default=100)
 
     return parser.parse_args()
 
 
-def maybe_mkdir(where: str):
+def maybe_mkdir(where: str | Path):
     if where:
         dir_loc = Path(where)
         dir_loc.mkdir(parents=True, exist_ok=True)
