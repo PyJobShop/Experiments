@@ -19,3 +19,4 @@ class ProblemVariant(str, Enum):
     RCPSP = "RCPSP"
     MMRCPSP = "MMRCPSP"
     RCMPSP = "RCMPSP"
+    ASLIB = "ASLIB"
