@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.10"
 resolution-markers = [
     "python_full_version < '3.11'",
@@ -473,7 +473,7 @@ requires-dist = [
     { name = "jupyterlab", specifier = ">=4.2.5" },
     { name = "numpy", specifier = ">=1.26.4" },
     { name = "openpyxl", specifier = ">=3.1.5" },
-    { name = "pyjobshop", extras = ["docplex"], git = "https://github.com/PyJobShop/PyJobShop/?rev=2a389a7" },
+    { name = "pyjobshop", extras = ["docplex"] },
 ]
 
 [[package]]
@@ -488,9 +488,13 @@ wheels = [
 [[package]]
 name = "fjsplib"
 version = "0.0.1"
-source = { git = "https://github.com/PyJobShop/FJSPLIB.git?rev=75b2d18#75b2d1859c9de1d08bfa6b0c0f72e66d53dcc76d" }
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "numpy" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/b2/4a/306e8ebf02405d79772594ea71d2a2c227b91cc94eda5941095a308655ee/fjsplib-0.0.1.tar.gz", hash = "sha256:4027dafd98ce86ad8b1eaf4531a37ae127f0dabea9f34da487092aef3ed63acf", size = 3641, upload-time = "2024-02-19T11:12:51.134Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/22/0a/a82347e443ca91b15573b3892ff0e8873a97ca839b76a437cae068331cee/fjsplib-0.0.1-py3-none-any.whl", hash = "sha256:82c769529003aa1f0e3bb964368fb4faf11f8b01701859d330174956e7dc62ef", size = 4107, upload-time = "2024-02-19T11:12:49.461Z" },
 ]
 
 [[package]]
@@ -1552,8 +1556,8 @@ wheels = [
 
 [[package]]
 name = "pyjobshop"
-version = "0.1.0a0"
-source = { git = "https://github.com/PyJobShop/PyJobShop/?rev=2a389a7#2a389a7d68b5722d33b08a52bf08f463a2fa80b8" }
+version = "0.0.6"
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "fjsplib" },
     { name = "matplotlib" },
@@ -1561,6 +1565,10 @@ dependencies = [
     { name = "psplib" },
     { name = "tomli" },
     { name = "tqdm" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/15/70/0f5cd261000d7cf621e42e4d685b84a87c4524f83be3c1de7591d1a7805a/pyjobshop-0.0.6.tar.gz", hash = "sha256:c6ed1d439d46f82dac896813752fb4da05cb27eebef9621497375bf02bdcc557", size = 34405, upload-time = "2025-08-25T15:17:31.444Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/32/5d/42c974d512fe5ef18bbacd40019efdad33c967b30aaeb0f421e1d103112a/pyjobshop-0.0.6-py3-none-any.whl", hash = "sha256:3b215feace2a994e2ed2d5531b6b3800cc99da766ab5024e4d11bd4a430217de", size = 46205, upload-time = "2025-08-25T15:17:29.321Z" },
 ]
 
 [package.optional-dependencies]

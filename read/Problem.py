@@ -8,6 +8,7 @@ class ProblemVariant(str, Enum):
     NPFSP = "NPFSP"
     NW_PFSP = "NW-PFSP"
     HFSP = "HFSP"
+    PMP = "PMP"
     # Permutation machine scheduling problems
     PFSP = "PFSP"
     SDST_PFSP = "SDST-PFSP"
