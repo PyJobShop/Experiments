@@ -25,6 +25,7 @@ class MachineInstance:
     jobs: list[list[TaskData]]  # also defines precedence constraints
     permutation: list[tuple[int, int]] | None = None  # tuples of machine idcs
     no_wait: bool = False
+    open_shop: bool = False  # if True, job tasks have no precedence
     setup_times: list[list[list[int]]] | None = None
     objective: str = "makespan"
     due_dates: list[int] | None = None
@@ -63,6 +64,10 @@ class MachineInstance:
 
                 for mach_idx, duration in task_data:
                     model.add_mode(task, machines[mach_idx], duration)
+
+            if self.open_shop:
+                # Open shop: a job's tasks have no precedence among them.
+                continue
 
             for pred, succ in pairwise(job2tasks[job_idx]):
                 # Assume linear routing of tasks as presented in the job data.
@@ -196,6 +201,14 @@ class MachineInstance:
                 jobs[job_idx].append([(mach_idx, duration)])
 
         return MachineInstance(num_machines, jobs)
+
+    @classmethod
+    def parse_osp(cls, loc: Path):
+        # Open shop has the same matrix format as NPFSP, but a job's tasks
+        # may be processed in any order, so there is no precedence between them.
+        instance = cls.parse_npfsp(loc)
+        instance.open_shop = True
+        return instance
 
     @classmethod
     def parse_nw_pfsp(cls, loc: Path):
