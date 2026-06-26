@@ -473,7 +473,7 @@ requires-dist = [
     { name = "jupyterlab", specifier = ">=4.2.5" },
     { name = "numpy", specifier = ">=1.26.4" },
     { name = "openpyxl", specifier = ">=3.1.5" },
-    { name = "pyjobshop", extras = ["docplex"], specifier = ">=0.0.7" },
+    { name = "pyjobshop", extras = ["docplex"], git = "https://github.com/PyJobShop/PyJobShop.git?rev=0510b1b" },
 ]
 
 [[package]]
@@ -1553,8 +1553,8 @@ wheels = [
 
 [[package]]
 name = "pyjobshop"
-version = "0.0.7"
-source = { registry = "https://pypi.org/simple" }
+version = "0.0.10a0"
+source = { git = "https://github.com/PyJobShop/PyJobShop.git?rev=0510b1b#0510b1ba022641fd6590922ae865550fd573fe43" }
 dependencies = [
     { name = "fjsplib" },
     { name = "matplotlib" },
@@ -1562,10 +1562,6 @@ dependencies = [
     { name = "psplib" },
     { name = "tomli" },
     { name = "tqdm" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/bb/ae/de044411dbde92acc7f87e3a81e1bf760c20803a3a91c35471cfce0087d6/pyjobshop-0.0.7.tar.gz", hash = "sha256:80a31f20790408a905583b0c7282fef5bff3978818053bfed70ee157dbfc693f", size = 40412, upload-time = "2025-09-20T13:56:29.114Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/39/d1/30d8660e4e831404a0adbb333c7cde4867dce8831ba009f09a114ca75a6c/pyjobshop-0.0.7-py3-none-any.whl", hash = "sha256:efb27515643e93bab1ae4256cc25c9679d7b7ff5819b0b08e634c4cceeb2a0ce", size = 52240, upload-time = "2025-09-20T13:56:28.244Z" },
 ]
 
 [package.optional-dependencies]
