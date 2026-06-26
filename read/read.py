@@ -6,16 +6,23 @@ from functools import partial
 from pyjobshop import ProblemData, read as _read
 
 
-def read(loc: Path, problem: ProblemVariant) -> ProblemData:
+def read(
+    loc: Path, problem: ProblemVariant, solver: str | None = None
+) -> ProblemData:
     """
     Reads a problem instance from file and returns a ProblemData instance.
+
+    The ``solver`` argument is passed to the parsers to apply solver-specific
+    modeling choices (e.g. the NW-PFSP permutation constraints).
     """
     machine_variants = {
         ProblemVariant.JSP: MachineInstance.parse_jsp,
         ProblemVariant.FJSP: MachineInstance.parse_fjsp,
         ProblemVariant.HFSP: MachineInstance.parse_hfsp,
         ProblemVariant.NPFSP: MachineInstance.parse_npfsp,
-        ProblemVariant.NW_PFSP: MachineInstance.parse_nw_pfsp,
+        ProblemVariant.NW_PFSP: partial(
+            MachineInstance.parse_nw_pfsp, solver=solver
+        ),
         ProblemVariant.PMP: MachineInstance.parse_pmp,
         ProblemVariant.OSP: MachineInstance.parse_osp,
         # Permutation machine scheduling

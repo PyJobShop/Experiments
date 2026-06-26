@@ -211,10 +211,16 @@ class MachineInstance:
         return instance
 
     @classmethod
-    def parse_nw_pfsp(cls, loc: Path):
+    def parse_nw_pfsp(cls, loc: Path, solver: str | None = None):
         instance = cls.parse_npfsp(loc)
         instance.no_wait = True
-        # TODO might add permutation here for CP Optimizer?
+
+        if solver == "cpoptimizer":
+            # For NW-PFSP, only CP Optimizer benefits from explicit permutation
+            # constraints. For OR-Tools the no-wait constraints already pin the
+            # sequence, so adding them only slows it down.
+            instance.permutation = list(pairwise(range(instance.num_machines)))
+
         return instance
 
     @classmethod
