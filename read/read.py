@@ -37,7 +37,7 @@ def read(
         # which are already supported directly by PyJobShop's read function.
         ProblemVariant.RCPSP: partial(_read, instance_format="patterson"),
         ProblemVariant.MMRCPSP: partial(_read, instance_format="psplib"),
-        ProblemVariant.RCMPSP: partial(_read, instance_format="psplib"),
+        ProblemVariant.RCMPSP: partial(_read, instance_format="mplib"),
         ProblemVariant.ASLIB: partial(_read, instance_format="aslib"),
     }
 
