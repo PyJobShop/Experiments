@@ -3,7 +3,7 @@ name = "experiments"
 version = "0.1.0"
 description = "Experiments for the PyJobShop paper submission."
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dependencies = [
     "jupyterlab>=4.2.5",
     "numpy>=1.26.4",
@@ -15,4 +15,4 @@ dependencies = [
 package = false
 
 [tool.uv.sources]
-pyjobshop = { git = "https://github.com/PyJobShop/PyJobShop.git", rev = "0510b1b" }
+pyjobshop = { git = "https://github.com/PyJobShop/PyJobShop.git", rev = "20d51ab" }
