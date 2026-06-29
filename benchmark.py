@@ -1,12 +1,13 @@
 import argparse
 import warnings
+from concurrent.futures import ProcessPoolExecutor
 from functools import partial
 from multiprocessing import cpu_count
 from pathlib import Path
 
 import numpy as np
 import tomli
-from tqdm.contrib.concurrent import process_map
+from tqdm import tqdm
 
 from pyjobshop import Result, solve
 from pathlib import Path
@@ -196,12 +197,17 @@ def benchmark(instances: list[Path], num_parallel_instances: int, **kwargs):
     if len(instances) == 1:
         results = [func(args[0])]
     else:
-        results = process_map(
-            func,
-            args,
-            max_workers=num_parallel_instances,
-            unit="instance",
-        )
+        # Recycle each worker after one instance (max_tasks_per_child=1) so that
+        # memory and any lingering solver subprocess are released between
+        # instances. Long-lived workers otherwise accumulate memory over the run
+        # and eventually OOM (notably CP Optimizer on the setup-time-heavy
+        # SDST-PFSP instances).
+        with ProcessPoolExecutor(
+            max_workers=num_parallel_instances, max_tasks_per_child=1
+        ) as executor:
+            results = list(
+                tqdm(executor.map(func, args), total=len(args), unit="instance")
+            )
 
     # Filter out the None results (permutation instances that were skipped).
     results = [res for res in results if res is not None]
